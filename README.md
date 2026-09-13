@@ -28,22 +28,24 @@ feedback. The dataset is downloaded at runtime and is not tracked in version con
 
 ## Project structure
 
+```
 music-popularity-bias-recommender/
 ├── requirements.txt
-├── data/ # dataset (downloaded at runtime, untracked)
+├── data/                  # dataset (downloaded at runtime, untracked)
 ├── notebooks/
-│ └── 01_explore_longtail.py # data loading and long-tail analysis
+│   └── 01_explore_longtail.py   # data loading and long-tail analysis
 ├── src/
-│ ├── data_loading.py # loading, filtering, weighting, train/test split
-│ ├── popularity.py # artist popularity, head/tail split, user groups
-│ ├── model.py # ALS baseline and Most-Popular reference
-│ ├── metrics.py # accuracy and bias metrics
-│ ├── rerank.py # the three mitigation methods
-│ └── evaluate.py # experiment runner and comparison
+│   ├── data_loading.py    # loading, filtering, weighting, train/test split
+│   ├── popularity.py      # artist popularity, head/tail split, user groups
+│   ├── model.py           # ALS baseline and Most-Popular reference
+│   ├── metrics.py         # accuracy and bias metrics
+│   ├── rerank.py          # the three mitigation methods
+│   └── evaluate.py        # experiment runner and comparison
 ├── app/
-│ └── demo.py # interactive comparison demo
+│   └── demo.py            # interactive comparison demo
 └── paper/
-└── outline.md # report structure
+    └── outline.md         # report structure
+```
 
 
 ## Setup
