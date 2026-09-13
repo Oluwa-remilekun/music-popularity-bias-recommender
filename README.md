@@ -1,65 +1,63 @@
-# Popularity-Bias Music Recommender
+# Music Popularity-Bias Recommender
 
-Senior seminar research project. **Goal:** hold a base recommender fixed and compare
-several *popularity-bias mitigation* methods to find which best surfaces niche artists
-without hurting recommendation quality — and for which listeners.
+A comparative study of methods for reducing popularity bias in music recommender
+systems. Collaborative-filtering recommenders tend to over-recommend already-popular
+artists and under-serve niche ones; this project holds a base recommender fixed and
+compares several mitigation methods to determine which best surfaces niche artists
+without sacrificing recommendation quality, and how that trade-off varies across
+listeners with different tastes.
 
-> **Note for anyone (or any agent) working in this repo:** the files below are
-> **scaffolding** — real structure with function signatures, docstrings, and `TODO`
-> markers, but the core logic is intentionally left unimplemented. This is a graded
-> student project; the implementation and the learning belong to the student. Fill in
-> the `TODO`s; don't replace them with a finished solution pulled from elsewhere.
+## Approach
 
-## What the project compares
-A fixed **ALS** recommender generates candidate artists per user. Four settings are
-compared, all re-ranking the *same* candidates:
-1. **Baseline** — raw ALS, no correction (reference)
-2. **Popularity penalty** — down-weight popular artists (simplest)
-3. **Binary xQuAD** — balance popular vs. niche groups (established method)
-4. **Calibrated Popularity** — personalized, match each user's own taste mix (hardest)
+A fixed ALS (implicit-feedback matrix factorization) model generates candidate artists
+per user. Four settings are compared, each re-ranking the same candidate lists:
 
-Everything is judged by one shared harness: **Recall@10, NDCG@10** (accuracy) plus
-**Average Recommendation Popularity, catalog coverage, Gini** (bias), with significance
-testing and a breakdown by listener type.
+1. **Baseline** — raw ALS with no correction (reference)
+2. **Popularity penalty** — down-weights popular artists
+3. **Binary xQuAD** — balances popular and niche groups
+4. **Calibrated Popularity** — personalized re-ranking matched to each user's own taste
 
-## Folder layout
-```
-popularity-bias-recommender/
-├── README.md              # you are here
-├── requirements.txt       # dependencies (pip install -r requirements.txt)
-├── .gitignore
-├── data/                  # dataset downloads here (gitignored)
+All settings are evaluated under one protocol: Recall@10 and NDCG@10 for accuracy, and
+Average Recommendation Popularity, catalog coverage, and the Gini index for bias, with
+significance testing and results broken down by listener group.
+
+## Dataset
+
+Last.fm-360K (~360,000 users, ~290,000 artists), with play counts treated as implicit
+feedback. The dataset is downloaded at runtime and is not tracked in version control.
+
+## Project structure
+
+music-popularity-bias-recommender/
+├── requirements.txt
+├── data/ # dataset (downloaded at runtime, untracked)
 ├── notebooks/
-│   └── 01_explore_longtail.py   # Week 1: load data + draw the long-tail plot
+│ └── 01_explore_longtail.py # data loading and long-tail analysis
 ├── src/
-│   ├── data_loading.py    # load, filter, weight, train/test split
-│   ├── popularity.py      # artist popularity, head/tail, user groups, Fig 1
-│   ├── model.py           # ALS baseline + Most-Popular reference
-│   ├── metrics.py         # accuracy + bias metrics
-│   ├── rerank.py          # the 3 mitigation methods
-│   └── evaluate.py        # experiment runner / comparison
+│ ├── data_loading.py # loading, filtering, weighting, train/test split
+│ ├── popularity.py # artist popularity, head/tail split, user groups
+│ ├── model.py # ALS baseline and Most-Popular reference
+│ ├── metrics.py # accuracy and bias metrics
+│ ├── rerank.py # the three mitigation methods
+│ └── evaluate.py # experiment runner and comparison
 ├── app/
-│   └── demo.py            # Streamlit comparison demo (Week 8, optional)
-├── results/               # figures + tables land here
+│ └── demo.py # interactive comparison demo
 └── paper/
-    └── outline.md         # report sections mapped to the plan
-```
+└── outline.md # report structure
 
-## Getting started (Week 1)
-1. `pip install -r requirements.txt`
-2. Open `notebooks/01_explore_longtail.py` (VS Code shows the `# %%` cells as a notebook).
-3. Run the cells to load the data and confirm the shapes (~292k artists, ~359k users).
-4. Complete the `TODO` to draw the long-tail plot — that's your first deliverable.
 
-## Build order (matches the 8-week roadmap)
-Weeks 1–3 build the foundation (data → ALS baseline → bias metrics). Weeks 4–6 add the
-three mitigation methods **easy → hard** (penalty → xQuAD → Calibrated Popularity).
-Week 7 is the paper; Week 8 is the demo + polish. The last two methods and the demo are
-"reach" items — droppable without breaking the project.
+## Setup
 
-## Key gotchas (read before coding)
-- Keep matrices **sparse** — never convert the full user×artist matrix to dense.
-- **No leakage:** held-out test interactions must be removed from training, and
-  popularity must be computed on the **training set only**.
-- **Validate each metric** on a tiny hand-computed toy example before trusting it at scale.
-- Confirm matrix **orientation** (`plays` is artists×users; transpose for user-based recs).
+pip install -r requirements.txt
+
+
+Then open `notebooks/01_explore_longtail.py` and run the cells to load the dataset and
+generate the long-tail popularity plot.
+
+## Method notes
+
+- All matrix operations use sparse representations.
+- Evaluation uses a per-user train/test split; held-out interactions are excluded from
+  training, and item popularity is computed on the training set only.
+- Metrics are unit-tested against small hand-verified cases.
+- The raw `plays` matrix is artists × users and is transposed for user-based recommendation.
