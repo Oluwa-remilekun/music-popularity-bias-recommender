@@ -1,0 +1,16 @@
+# Downloaded dataset (large ~176MB) and the implicit cache
+data/
+implicit_datasets/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.ipynb_checkpoints/
+
+# Large result dumps
+results/*.pkl
+
+# OS
+.DS_Store
