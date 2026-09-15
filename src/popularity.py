@@ -9,14 +9,9 @@ import matplotlib.pyplot as plt
 
 
 def artist_popularity(train_matrix):
-    """Popularity of each artist = number of distinct users who played it.
-
-    IMPORTANT: compute this on the TRAINING matrix only (no test leakage).
-
-    TODO: from the users x artists training matrix, count nonzero entries
-    per artist (column). Return an np.ndarray of length n_artists.
-    """
-    raise NotImplementedError("Week 3: count listeners per artist on TRAIN")
+    """Number of distinct listeners per artist, counted on the training matrix."""
+    listeners = np.asarray((train_matrix > 0).sum(axis=0)).ravel()
+    return listeners
 
 
 def head_tail_split(popularity, head_frac=0.2):
@@ -29,16 +24,16 @@ def head_tail_split(popularity, head_frac=0.2):
 
 
 def long_tail_plot(popularity, save_path="results/fig1_longtail.png"):
-    """Draw the rank-vs-popularity long-tail curve (your Week 1 Figure 1).
-
-    TODO:
-      - sort popularity in descending order
-      - plot rank (x) vs popularity (y); a log scale on y (or both) shows the
-        classic 'playground slide' shape
-      - label axes, title it, and save to `save_path`
-    This figure is the visual proof that popularity bias exists in your data.
-    """
-    raise NotImplementedError("Week 1: draw + save the long-tail plot")
+    """Plot artists ranked by popularity to show the long-tail distribution."""
+    sorted_counts = np.sort(popularity)[::-1]
+    plt.figure(figsize=(8, 5))
+    plt.plot(sorted_counts)
+    plt.yscale("log")
+    plt.xlabel("Artist rank (most to least popular)")
+    plt.ylabel("Number of listeners (log scale)")
+    plt.title("Long-tail distribution of artist popularity")
+    plt.savefig(save_path, dpi=150, bbox_inches="tight")
+    plt.show()
 
 
 def user_mainstream_groups(train_matrix, popularity, n_groups=3):

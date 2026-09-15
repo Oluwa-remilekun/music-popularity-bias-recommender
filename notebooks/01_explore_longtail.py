@@ -22,11 +22,16 @@ print("num artists:", len(artists))
 print("num users:  ", len(users))
 # Sanity check: expect roughly 292,000 artists and 359,000 users.
 # (plays is artists x users — we'll flip it next.)
-
+import numpy as np
+user_items = data_loading.to_user_items(plays)
+listeners = popularity.artist_popularity(user_items)
+top10 = np.argsort(listeners)[::-1][:10]
+for i in top10:
+    print(artists[i], "-", int(listeners[i]), "listeners")
 # %%
 # --- Cell 3: peek at real data so it feels concrete ---
 # TODO: print a few artist names, e.g. artists[:10], to see what's inside.
-
+print(artists[:50])
 # %%
 # --- Cell 4: YOUR FIRST DELIVERABLE — the long-tail plot ---
 # Steps (fill these in using the stubs in src/):
@@ -38,3 +43,7 @@ print("num users:  ", len(users))
 # flat tail on the right (thousands of barely-heard artists). That shape IS the problem.
 #
 # TODO: implement the three stub functions above, then call them here.
+user_items = data_loading.to_user_items(plays)
+listeners = popularity.artist_popularity(user_items)
+popularity.long_tail_plot(listeners, save_path="../results/fig1_longtail.png")
+# %%
