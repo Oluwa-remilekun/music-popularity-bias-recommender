@@ -10,12 +10,15 @@ def artist_popularity(train_matrix):
 
 
 def head_tail_split(popularity, head_frac=0.2):
-    """Label the top head_frac of artists by popularity as 'head' (popular); rest are tail."""
-    popularity = np.asarray(popularity)
-    n_head = max(1, int(len(popularity) * head_frac))
-    top_idx = np.argsort(popularity)[::-1][:n_head]
+    """Mass-based (Pareto short-head) split: 'head' = the most-popular artists that together
+    account for head_frac of all listening. The rest are the long tail. This is meaningful for
+    re-ranking, unlike a top-k-by-count split where the tail is un-recommendable 1-listener artists."""
+    popularity = np.asarray(popularity, dtype=float)
+    order = np.argsort(popularity)[::-1]
+    cum = np.cumsum(popularity[order])
+    k = int(np.searchsorted(cum, head_frac * cum[-1]) + 1)
     is_head = np.zeros(len(popularity), dtype=bool)
-    is_head[top_idx] = True
+    is_head[order[:k]] = True
     return is_head
 
 
