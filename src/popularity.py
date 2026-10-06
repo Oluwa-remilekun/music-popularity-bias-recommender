@@ -1,8 +1,4 @@
-"""Artist popularity, head/tail split, user mainstream groups, and Figure 1.
-
-Roadmap: Weeks 1 and 3.  See Technical Spec, Sections 3 & 5.
-Stubs only -- fill in the TODOs.
-"""
+"""Artist popularity, head/tail split, user mainstream groups, and the long-tail figure."""
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -10,17 +6,33 @@ import matplotlib.pyplot as plt
 
 def artist_popularity(train_matrix):
     """Number of distinct listeners per artist, counted on the training matrix."""
-    listeners = np.asarray((train_matrix > 0).sum(axis=0)).ravel()
-    return listeners
+    return np.asarray((train_matrix > 0).sum(axis=0)).ravel()
 
 
 def head_tail_split(popularity, head_frac=0.2):
-    """Label artists as 'head' (popular) vs 'tail' (niche).
+    """Label the top head_frac of artists by popularity as 'head' (popular); rest are tail."""
+    popularity = np.asarray(popularity)
+    n_head = max(1, int(len(popularity) * head_frac))
+    top_idx = np.argsort(popularity)[::-1][:n_head]
+    is_head = np.zeros(len(popularity), dtype=bool)
+    is_head[top_idx] = True
+    return is_head
 
-    TODO: mark the top `head_frac` of artists by popularity as head.
-    Return a boolean mask `is_head` (True = popular head).
-    """
-    raise NotImplementedError("Week 3: split catalog into head vs tail")
+
+def user_mainstream_groups(train_matrix, popularity, n_groups=3):
+    """Group users by how mainstream their taste is (mean popularity of artists they play).
+    Returns an array of group labels 0..n_groups-1 (0 = least mainstream)."""
+    popularity = np.asarray(popularity)
+    n_users = train_matrix.shape[0]
+    mainstream = np.zeros(n_users)
+    for u in range(n_users):
+        arts = train_matrix[u].indices
+        if len(arts) > 0:
+            mainstream[u] = popularity[arts].mean()
+    ranks = np.argsort(np.argsort(mainstream))
+    labels = (ranks * n_groups // len(mainstream)).astype(int)
+    labels[labels == n_groups] = n_groups - 1
+    return labels
 
 
 def long_tail_plot(popularity, save_path="results/fig1_longtail.png"):
@@ -34,18 +46,3 @@ def long_tail_plot(popularity, save_path="results/fig1_longtail.png"):
     plt.title("Long-tail distribution of artist popularity")
     plt.savefig(save_path, dpi=150, bbox_inches="tight")
     plt.show()
-
-
-def user_mainstream_groups(train_matrix, popularity, n_groups=3):
-    """Segment users into low / medium / high 'mainstream-ness'.
-
-    A user's mainstream-ness = the average popularity of the artists they
-    listen to. Low-mainstream users are the ones popularity bias hurts most,
-    and the ones your 'best for whom' analysis focuses on.
-
-    TODO:
-      - for each user, compute the mean popularity of the artists in their row
-      - bucket users into `n_groups` (e.g. by tertiles)
-      - return an np.ndarray of group labels per user
-    """
-    raise NotImplementedError("Week 3: bucket users by taste mainstream-ness")
