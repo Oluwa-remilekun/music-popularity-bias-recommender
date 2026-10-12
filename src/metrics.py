@@ -47,14 +47,14 @@ def catalog_coverage(recs, n_artists):
 
 
 def gini_index(recs, n_artists):
-    """Gini of recommendation exposure across artists. 0 = perfectly even, higher = concentrated."""
+    """Gini of recommendation exposure across the whole catalog. 0 = perfectly even, higher = concentrated."""
     exposure = np.zeros(n_artists)
     for items in recs.values():
         for i in items:
             exposure[i] += 1
-    c = np.sort(exposure[exposure > 0])
-    n = len(c)
-    if n == 0:
+    c = np.sort(exposure)              # <-- whole catalog, zeros included (was exposure[exposure > 0])
+    n = len(c)                         
+    if n == 0 or c.sum() == 0:         
         return 0.0
     idx = np.arange(1, n + 1)
     return float((2 * np.sum(idx * c) / (n * np.sum(c))) - (n + 1) / n)
